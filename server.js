@@ -15,10 +15,6 @@ const html = `
 <title>AI Video Agent</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -27,41 +23,40 @@ body {
 }
 
 .container {
-  width: 92%;
   max-width: 700px;
-  margin: 40px auto;
+  margin: 30px auto;
+  padding: 20px;
 }
 
 h1 {
   text-align: center;
-  font-size: 34px;
-  margin-bottom: 8px;
+  font-size: 32px;
 }
 
 .subtitle {
   text-align: center;
-  color: #aab2c8;
-  margin-bottom: 30px;
+  color: #aaa;
+  margin-bottom: 25px;
 }
 
 .card {
   background: #151c31;
-  padding: 24px;
-  border-radius: 20px;
-  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+  padding: 22px;
+  border-radius: 18px;
 }
 
 label {
   display: block;
-  margin: 15px 0 7px;
+  margin-top: 16px;
+  margin-bottom: 7px;
   font-weight: bold;
 }
 
 input, select {
   width: 100%;
   padding: 14px;
-  border: 1px solid #303a58;
-  border-radius: 12px;
+  border-radius: 10px;
+  border: 1px solid #39435f;
   background: #0d1427;
   color: white;
   font-size: 16px;
@@ -72,29 +67,20 @@ button {
   margin-top: 25px;
   padding: 16px;
   border: 0;
-  border-radius: 12px;
-  background: #4f7cff;
+  border-radius: 10px;
+  background: #5865f2;
   color: white;
   font-size: 18px;
   font-weight: bold;
 }
 
-button:active {
-  transform: scale(.98);
-}
-
 #result {
-  display: none;
-  margin-top: 25px;
-  padding: 20px;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
   background: #0d1427;
-  border-radius: 15px;
-  line-height: 1.9;
-}
-
-.step {
-  padding: 10px 0;
-  border-bottom: 1px solid #27314b;
+  display: none;
+  line-height: 2;
 }
 </style>
 </head>
@@ -112,12 +98,11 @@ button:active {
 <div class="card">
 
 <label>عنوان الفيلم</label>
-<input id="title" placeholder="مثال: الرسالة التي وصلت بعد وفاة صاحبها">
+<input id="title" placeholder="اكتب عنوان الفيلم">
 
 <label>نوع الفيلم</label>
 <select id="genre">
 <option>غموض</option>
-<option>رعب</option>
 <option>خيال علمي</option>
 <option>مغامرة</option>
 <option>دراما</option>
@@ -127,19 +112,19 @@ button:active {
 
 <label>مدة الفيلم</label>
 <select id="duration">
-<option value="60">1 دقيقة</option>
-<option value="180">3 دقائق</option>
-<option value="300">5 دقائق</option>
-<option value="600">10 دقائق</option>
-<option value="900">15 دقيقة</option>
+<option value="1">1 دقيقة</option>
+<option value="3">3 دقائق</option>
+<option value="5">5 دقائق</option>
+<option value="10">10 دقائق</option>
+<option value="15">15 دقيقة</option>
 </select>
 
 <label>أسلوب الفيديو</label>
 <select id="style">
 <option>سينمائي واقعي</option>
 <option>أنمي شبه واقعي</option>
-<option>سينمائي خيال علمي</option>
-<option>واقعي درامي</option>
+<option>خيال علمي سينمائي</option>
+<option>درامي واقعي</option>
 </select>
 
 <label>نسبة الفيديو</label>
@@ -163,22 +148,21 @@ button:active {
 async function startAgent() {
 
   const title = document.getElementById("title").value.trim();
+  const result = document.getElementById("result");
 
   if (!title) {
     alert("اكتب عنوان الفيلم أولاً");
     return;
   }
 
-  const result = document.getElementById("result");
-
   result.style.display = "block";
 
-  result.innerHTML = "⏳ الوكيل يحلل فكرة الفيلم...";
+  result.innerHTML = "⏳ الوكيل بدأ تحليل الفيلم...";
 
   const data = {
     title: title,
     genre: document.getElementById("genre").value,
-    duration: Number(document.getElementById("duration").value),
+    duration: document.getElementById("duration").value,
     style: document.getElementById("style").value,
     ratio: document.getElementById("ratio").value
   };
@@ -195,23 +179,18 @@ async function startAgent() {
 
     const project = await response.json();
 
-    result.innerHTML = \`
-      <div class="step">✅ تم استلام المشروع</div>
-      <div class="step">🎬 العنوان: \${project.title}</div>
-      <div class="step">🎭 النوع: \${project.genre}</div>
-      <div class="step">⏱️ المدة: \${project.duration / 60} دقيقة</div>
-      <div class="step">🎨 الأسلوب: \${project.style}</div>
-      <div class="step">📺 المقاس: \${project.ratio}</div>
-      <div class="step">🧠 المرحلة التالية: بناء Story Bible</div>
-      <div class="step">🎞️ ثم تقسيم الفيلم إلى مشاهد</div>
-      <div class="step">📝 ثم إنشاء Prompts للمشاهد</div>
-      <div class="step">🤖 ثم ربط مولد الفيديو</div>
-    \`;
+    result.innerHTML =
+      "✅ تم إنشاء المشروع<br>" +
+      "🎬 العنوان: " + project.title + "<br>" +
+      "🎭 النوع: " + project.genre + "<br>" +
+      "⏱️ المدة: " + project.duration + " دقائق<br>" +
+      "🎨 الأسلوب: " + project.style + "<br>" +
+      "📺 المقاس: " + project.ratio + "<br><br>" +
+      "🧠 الخطوة التالية: إنشاء Story Bible والمشاهد.";
 
   } catch (error) {
 
-    result.innerHTML =
-      "❌ حدث خطأ أثناء تشغيل الوكيل";
+    result.innerHTML = "❌ حدث خطأ أثناء تشغيل الوكيل.";
 
   }
 }
@@ -228,13 +207,7 @@ app.get("/", (req, res) => {
 
 app.post("/api/create-project", (req, res) => {
 
-  const {
-    title,
-    genre,
-    duration,
-    style,
-    ratio
-  } = req.body;
+  const { title, genre, duration, style, ratio } = req.body;
 
   if (!title) {
     return res.status(400).json({
@@ -243,7 +216,6 @@ app.post("/api/create-project", (req, res) => {
   }
 
   res.json({
-    success: true,
     title,
     genre,
     duration,
